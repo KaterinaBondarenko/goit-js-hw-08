@@ -1,61 +1,34 @@
 import throttle from 'lodash.throttle';
 
-const LOCALSTORAGE_KEY = 'feedback-form-state';
-// const formEl = document.querySelector('.feedback-form');
+const LOCALSTORAGE_KEY = 'selectedFilters';
+const formEl = document.querySelector('.feedback-form');
 
-const refs = {
-  form: document.querySelector('.feedback-form'),
-  textarea: document.querySelector('.feedback-form  textarea'),
-};
+initForm();
 
-refs.form.addEventListener('submit', onFormSubmit);
-refs.textarea.addEventListener('input', throttle(onTextareaInput, 200));
+formEl.addEventListener('submit', onFormSubmit);
+formEl.addEventListener('input', throttle(onFormInput, 500));
 
-// populateTextarea();
-
-/*
- * - Останавливаем поведение по умолчанию
- * - Убираем сообщение из хранилища
- * - Очищаем форму
- */
 function onFormSubmit(evt) {
   evt.preventDefault();
-
-  console.log('Отправляем форму');
+  const formData = new FormData(formEl);
+  formData.forEach((value, name) => console.log(value, name));
   evt.currentTarget.reset();
   localStorage.removeItem(LOCALSTORAGE_KEY);
 }
 
-/*
- * - Получаем значение поля
- * - Сохраняем его в хранилище
- * - Можно добавить throttle
- */
-function onTextareaInput(evt) {
-  const message = evt.target.value;
-
-  localStorage.setItem(LOCALSTORAGE_KEY, message);
+function onFormInput(evt) {
+  let persistedFilters = localStorage.getItem(LOCALSTORAGE_KEY);
+  persistedFilters = persistedFilters ? JSON.parse(persistedFilters) : {};
+  persistedFilters[evt.target.name] = evt.target.value;
+  localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(persistedFilters));
 }
 
-/*
- * - Получаем значение из хранилища
- * - Если там что-то было, обновляем DOM
- */
-// function populateTextarea() {
-//   const savedMessage = localStorage.getItem(LOCALSTORAGE_KEY);
-
-//   if (savedMessage) {
-//     refs.textarea.value = savedMessage;
-//   }
-// }
-
-// const formData = {};
-
-// refs.form.addEventListener('input', e => {
-//   // console.log(e.target.name);
-//   // console.log(e.target.value);
-
-//   formData[e.target.name] = e.target.value;
-
-//   console.log(formData);
-// });
+function initForm() {
+  let persistedFilters = localStorage.getItem(LOCALSTORAGE_KEY);
+  if (persistedFilters) {
+    persistedFilters = JSON.parse(persistedFilters);
+    Object.entries(persistedFilters).forEach(([name, value]) => {
+      formEl.elements[name].value = value;
+    });
+  }
+}
