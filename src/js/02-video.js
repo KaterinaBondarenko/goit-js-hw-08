@@ -14,5 +14,9 @@ function onSaveTime(evt) {
 }
 
 function onReadTime() {
-  player.setCurrentTime(localStorage.getItem(LOCALSTORAGE_KEY));
+  let time = localStorage.getItem(LOCALSTORAGE_KEY);
+  if (time) {
+    time = localStorage.getItem(LOCALSTORAGE_KEY);
+    player.setCurrentTime(time);
+  }
 }
