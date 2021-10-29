@@ -18,5 +18,7 @@ function onReadTime() {
   if (time) {
     time = localStorage.getItem(LOCALSTORAGE_KEY);
     player.setCurrentTime(time);
+    localStorage.removeItem(LOCALSTORAGE_KEY);
+    player.off('play', onReadTime);
   }
 }
